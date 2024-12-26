@@ -221,7 +221,7 @@ export const useChatHandler = () => {
 
       validateChatSettings(
         chatSettings,
-        modelData,
+        { ...modelData!, provider: "custom" },
         profile,
         selectedWorkspace,
         messageContent
@@ -307,35 +307,20 @@ export const useChatHandler = () => {
           setToolInUse
         )
       } else {
-        if (modelData!.provider === "ollama") {
-          generatedText = await handleLocalChat(
-            payload,
-            profile!,
-            chatSettings!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse
-          )
-        } else {
-          generatedText = await handleHostedChat(
-            payload,
-            profile!,
-            modelData!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            newMessageImages,
-            chatImages,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse
-          )
-        }
+        generatedText = await handleHostedChat(
+          payload,
+          profile!,
+          { ...modelData!, provider: "custom" },
+          tempAssistantChatMessage,
+          isRegeneration,
+          newAbortController,
+          newMessageImages,
+          chatImages,
+          setIsGenerating,
+          setFirstTokenReceived,
+          setChatMessages,
+          setToolInUse
+        )
       }
 
       if (!currentChat) {
@@ -368,7 +353,7 @@ export const useChatHandler = () => {
         chatMessages,
         currentChat,
         profile!,
-        modelData!,
+        { ...modelData!, provider: "custom" },
         messageContent,
         generatedText,
         newMessageImages,
