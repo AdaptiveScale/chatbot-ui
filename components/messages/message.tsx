@@ -228,12 +228,13 @@ export const Message: FC<MessageProps> = ({
                   />
                 ) : (
                   <WithTooltip
-                    display={<div>{MODEL_DATA?.modelName}</div>}
+                    display={<div>{"Kinetica AI"}</div>}
                     trigger={
-                      <ModelIcon
-                        provider={modelDetails?.provider || "custom"}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
+                      <Image
+                        src={"/kinetica.png"}
+                        alt={"kinetica"}
+                        width={40}
+                        height={40}
                       />
                     }
                   />
@@ -255,13 +256,7 @@ export const Message: FC<MessageProps> = ({
 
               <div className="font-semibold">
                 {message.role === "assistant"
-                  ? message.assistant_id
-                    ? assistants.find(
-                        assistant => assistant.id === message.assistant_id
-                      )?.name
-                    : selectedAssistant
-                      ? selectedAssistant?.name
-                      : MODEL_DATA?.modelName
+                  ? "Kinetica AI"
                   : profile?.display_name ?? profile?.username}
               </div>
             </div>

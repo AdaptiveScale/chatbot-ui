@@ -11,7 +11,21 @@ interface MessageMarkdownProps {
 export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
   const getContent = () => {
     try {
-      return JSON.parse(content).html
+      const str = content as string
+      const values = str.split("data:").slice(-1)[0]
+      const ctn =
+        "<style>\n" +
+        "        h2 { color: #271857; }\n" +
+        "        .section { margin-bottom: 40px; }\n" +
+        "        table { width: 80%; margin: 0 auto; border-collapse: collapse; }\n" +
+        "        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }\n" +
+        "        th { background-color: #f2f2f2; }\n" +
+        "        pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ddd; }\n" +
+        "        .chart-container { margin-top: 50px; }\n" +
+        "    </style>"
+      return ctn + JSON.parse(values).value
+      // console.log(JSON.parse(content.replace('data:').trim()))
+      // return JSON.parse(content).html
     } catch (e) {
       return content
     }
@@ -68,6 +82,10 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
     // >
     //   {content}
     // </MessageMarkdownMemoized>
-    <div dangerouslySetInnerHTML={{ __html: getContent() }} />
+    <div
+      style={{ maxHeight: "100%" }}
+      dangerouslySetInnerHTML={{ __html: getContent() }}
+    />
+    // <div></div>
   )
 }

@@ -1,10 +1,12 @@
+import time
+
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.io import to_html
 from typing import Dict, Any
 import json
 from bs4 import BeautifulSoup
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 
 app = Flask(__name__)
 
@@ -75,9 +77,7 @@ def format_output(input_content: Any) -> str:
     return html_content
 
 
-@app.get('/')
-def stream_last_node() -> None:
-    state = test_input
+def stream_last_node(state: dict) -> None:
     """
     Handles interaction and generates HTML output based on the state.
 
@@ -87,74 +87,71 @@ def stream_last_node() -> None:
     Returns:
         dict: JSON containing the HTML content.
     """
-    html_content = """
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { color: #4CAF50; }
-        .section { margin-bottom: 40px; }
-        table { width: 80%; margin: 0 auto; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ddd; }
-        .chart-container { margin-top: 50px; }
-    </style>
-    """
+    html_content = ''
 
-    # Display Main Answer
-    if "answer" in state:
-        html_content += f"<div class='section'><h2>Main Response</h2>{format_output(state['answer'])}</div>"
+    for key in state:
+        # Display Main Answer
+        if key == "answer":
+            html_content += f"<div class='section'><h2>Main Response</h2>{format_output(state['answer'])}</div>"
 
-    # Handle PCAP Errors
-    if "pcap_error_analysis" in state:
-        html_content += "<div class='section'><h2>PCAP Error Analysis</h2>"
-        for item in state["pcap_error_analysis"]:
-            for element in item:
-                html_content += format_output(element)
-        html_content += "</div>"
+        # Handle PCAP Errors
+        if state == "pcap_error_analysis":
+            html_content += "<div class='section'><h2>PCAP Error Analysis</h2>"
+            for item in state["pcap_error_analysis"]:
+                for element in item:
+                    html_content += format_output(element)
+            html_content += "</div>"
 
-    # Handle SIP Errors
-    if "sip_call_flow_error_analysis" in state:
-        html_content += "<div class='section'><h2>SIP Call Flow Error Analysis</h2>"
-        for item in state["sip_call_flow_error_analysis"]:
-            html_content += format_output(f"**SIP call ID**: {item.get('sip_call_id', 'N/A')}")
-            html_content += format_output(f"**Analysis**: {item.get('analysis', 'No analysis provided.')}")
-            html_content += format_output(item.get('dataframe', df1))
-        html_content += "</div>"
+        # Handle SIP Errors
+        if key == "sip_call_flow_error_analysis":
+            html_content += "<div class='section'><h2>SIP Call Flow Error Analysis</h2>"
+            for item in state["sip_call_flow_error_analysis"]:
+                html_content += format_output(f"**SIP call ID**: {item.get('sip_call_id', 'N/A')}")
+                html_content += format_output(f"**Analysis**: {item.get('analysis', 'No analysis provided.')}")
+                html_content += format_output(item.get('dataframe', df1))
+            html_content += "</div>"
 
-    # Handle HTTP2 Errors
-    if "http2_call_flow_error_analysis" in state:
-        html_content += "<div class='section'><h2>HTTP2 Call Flow Error Analysis</h2>"
-        for item in state["http2_call_flow_error_analysis"]:
-            html_content += format_output(f"**HTTP2 Stream ID**: {item.get('http2_streamid', 'N/A')}")
-            html_content += format_output(f"**Analysis**: {item.get('analysis', 'No analysis provided.')}")
-            html_content += format_output(item.get('dataframe', df1))
-        html_content += "</div>"
+        # Handle HTTP2 Errors
+        if key == "http2_call_flow_error_analysis":
+            html_content += "<div class='section'><h2>HTTP2 Call Flow Error Analysis</h2>"
+            for item in state["http2_call_flow_error_analysis"]:
+                html_content += format_output(f"**HTTP2 Stream ID**: {item.get('http2_streamid', 'N/A')}")
+                html_content += format_output(f"**Analysis**: {item.get('analysis', 'No analysis provided.')}")
+                html_content += format_output(item.get('dataframe', df1))
+            html_content += "</div>"
 
-    # Handle Other Protocol Errors
-    if "all_protocol_error_analysis_except_sip_and_http2" in state:
-        html_content += "<div class='section'><h2>Other Protocol Errors</h2>"
-        for item in state["all_protocol_error_analysis_except_sip_and_http2"]:
-            html_content += format_output(f"**Protocol**: {item.get('protocol', 'Unknown')}")
-            html_content += format_output(f"**Analysis**: {item.get('analysis', 'No analysis provided.')}")
-            html_content += format_output(item.get('dataframe', df2))
-        html_content += "</div>"
+        # Handle Other Protocol Errors
+        if key == "all_protocol_error_analysis_except_sip_and_http2":
+            html_content += "<div class='section'><h2>Other Protocol Errors</h2>"
+            for item in state["all_protocol_error_analysis_except_sip_and_http2"]:
+                html_content += format_output(f"**Protocol**: {item.get('protocol', 'Unknown')}")
+                html_content += format_output(f"**Analysis**: {item.get('analysis', 'No analysis provided.')}")
+                html_content += format_output(item.get('dataframe', df2))
+            html_content += "</div>"
 
-    # Handle Solution Results
-    if "solution_results" in state:
-        html_content += "<div class='section'><h2>Solution Results</h2>"
-        for step, solution in state["solution_results"].items():
-            html_content += f"<h3>{step}</h3>"
-            for report in solution.get("analysis_report", []):
-                html_content += format_output(report)
-            for error in solution.get("error_report", []):
-                html_content += format_output(error)
-            for sql_result in solution.get("sql_results", []):
-                html_content += format_output(sql_result)
-            if "chart" in solution and solution["chart"]:
-                html_content += format_output(fig)
-        html_content += "</div>"
+        # Handle Solution Results
+        if key == "solution_results":
+            html_content += "<div class='section'><h2>Solution Results</h2>"
+            for step, solution in state["solution_results"].items():
+                html_content += f"<h3>{step}</h3>"
+                for report in solution.get("analysis_report", []):
+                    html_content += format_output(report)
+                for error in solution.get("error_report", []):
+                    html_content += format_output(error)
+                for sql_result in solution.get("sql_results", []):
+                    html_content += format_output(sql_result)
+                if "chart" in solution and solution["chart"]:
+                    html_content += format_output(fig)
+            html_content += "</div>"
 
-    return jsonify({"html": html_content})
+        chunk = json.dumps({'value': html_content})
+        yield f"data: {chunk}\n\n"
+        time.sleep(1)
+
+
+@app.post('/')
+def get_response():
+    return Response(stream_last_node(test_input), mimetype='text/event-stream')
 
 
 def check_credentials(username: str, password: str) -> bool:

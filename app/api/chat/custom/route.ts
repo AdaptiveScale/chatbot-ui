@@ -1,4 +1,5 @@
 import { ServerRuntime } from "next"
+import { StreamingTextResponse } from "ai"
 import { ChatSettings } from "@/types"
 
 export const runtime: ServerRuntime = "edge"
@@ -12,26 +13,30 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Call Flask endpoint to retrieve the HTML content
+    // Send the prompt to the Flask backend
     const flaskResponse = await fetch("http://localhost:8000/", {
-      method: "GET"
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatSettings, messages, customModelId })
     })
 
     if (!flaskResponse.ok) {
       throw new Error(`Flask endpoint returned ${flaskResponse.status}`)
     }
 
-    const flaskData = await flaskResponse.json()
+    const readableStream = flaskResponse.body
 
-    return new Response(JSON.stringify(flaskData), {
-      headers: { "Content-Type": "application/json" },
-      status: 200
-    })
+    if (!readableStream) {
+      throw new Error("No response body from Flask backend")
+    }
+    // Wrap the readable stream with StreamingTextResponse
+    return new StreamingTextResponse(readableStream)
   } catch (error: any) {
-    let errorMessage = error.message || "An unexpected error occurred"
+    const errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
 
     return new Response(JSON.stringify({ message: errorMessage }), {
+      headers: { "Content-Type": "application/json" },
       status: errorCode
     })
   }

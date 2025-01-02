@@ -71,13 +71,6 @@ export type Database = {
             referencedRelation: "collections"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "assistant_collections_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       assistant_files: {

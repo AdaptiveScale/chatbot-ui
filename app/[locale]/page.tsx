@@ -4,6 +4,7 @@ import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
 import { IconArrowRight } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function HomePage() {
   const { theme } = useTheme()
@@ -11,7 +12,12 @@ export default function HomePage() {
   return (
     <div className="flex size-full flex-col items-center justify-center">
       <div>
-        <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
+        <Image
+          src={"/kinetica.png"}
+          alt={"kinetica"}
+          width={200}
+          height={150}
+        />
       </div>
 
       <div className="mt-2 text-4xl font-bold">Chatbot UI</div>
