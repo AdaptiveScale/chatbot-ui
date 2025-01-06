@@ -1,3 +1,5 @@
 pandas
 plotly
 bs4
+flask_reuploaded
+flask_cors
