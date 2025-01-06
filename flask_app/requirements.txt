@@ -1,0 +1,3 @@
+pandas
+plotly
+bs4

@@ -140,7 +140,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     collections: updateCollection,
     assistants: updateAssistant,
     tools: updateTool,
-    models: updateModel
+    models: updateModel,
+    assistant_prompts: updateModel
   }
 
   const stateUpdateFunctions = {
@@ -151,7 +152,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    assistant_prompts: setModels
   }
 
   const updateFolder = async (itemId: string, folderId: string | null) => {

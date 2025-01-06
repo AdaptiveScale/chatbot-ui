@@ -196,7 +196,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setSelectedAssistantTools
     },
     tools: null,
-    models: null
+    models: null,
+    assistant_prompts: null
   }
 
   const fetchDataFunctions = {
@@ -226,7 +227,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setSelectedAssistantTools([])
     },
     tools: null,
-    models: null
+    models: null,
+    assistant_prompts: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -256,6 +258,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       return item.workspaces
     },
     models: async (modelId: string) => {
+      const item = await getModelWorkspacesByModelId(modelId)
+      return item.workspaces
+    },
+    assistant_prompts: async (modelId: string) => {
       const item = await getModelWorkspacesByModelId(modelId)
       return item.workspaces
     }
@@ -568,6 +574,23 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedModel
+    },
+    assistant_prompts: async (
+      modelId: string,
+      updateState: TablesUpdate<"models">
+    ) => {
+      const updatedModel = await updateModel(modelId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        modelId,
+        deleteModelWorkspace,
+        createModelWorkspaces as any,
+        "model_id"
+      )
+
+      return updatedModel
     }
   }
 
@@ -579,7 +602,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    assistant_prompts: setModels
   }
 
   const handleUpdate = async () => {

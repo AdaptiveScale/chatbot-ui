@@ -74,6 +74,9 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     },
     models: async (model: Tables<"models">) => {
       await deleteModel(model.id)
+    },
+    assistant_prompts: async (model: Tables<"models">) => {
+      await deleteModel(model.id)
     }
   }
 
@@ -85,7 +88,8 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    assistant_prompts: setModels
   }
 
   const handleDelete = async () => {

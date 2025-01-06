@@ -15,9 +15,7 @@ interface CreateFileProps {
 export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
 
-  const [name, setName] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [description, setDescription] = useState("")
+  const [isTyping] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleSelectedFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,8 +26,6 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
     if (!file) return
 
     setSelectedFile(file)
-    const fileNameWithoutExtension = file.name.split(".").slice(0, -1).join(".")
-    setName(fileNameWithoutExtension)
   }
 
   if (!profile) return null
@@ -42,8 +38,8 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
         {
           file: selectedFile,
           user_id: profile.user_id,
-          name,
-          description,
+          name: "",
+          description: "",
           file_path: "",
           size: selectedFile?.size || 0,
           tokens: 0,
@@ -62,28 +58,6 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
               type="file"
               onChange={handleSelectedFile}
               accept={ACCEPTED_FILE_TYPES}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Name</Label>
-
-            <Input
-              placeholder="File name..."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={FILE_NAME_MAX}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Description</Label>
-
-            <Input
-              placeholder="File description..."
-              value={name}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={FILE_DESCRIPTION_MAX}
             />
           </div>
         </>

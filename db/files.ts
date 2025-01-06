@@ -35,7 +35,25 @@ export const getFileWorkspacesByWorkspaceId = async (workspaceId: string) => {
     throw new Error(error.message)
   }
 
-  return workspace
+  const fetchFiles = async () => {
+    const response = await fetch("http://localhost:8000/files/", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error fetching files: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data
+  }
+
+  const files = await fetchFiles()
+
+  return files
 }
 
 export const getFileWorkspacesByFileId = async (fileId: string) => {
@@ -82,6 +100,23 @@ export const createFileBasedOnExtension = async (
   } else {
     return createFile(file, fileRecord, workspace_id, embeddingsProvider)
   }
+}
+
+export const uploadFileFlask = async (file: File): Promise<Response> => {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const response = await fetch("http://localhost:8000/upload/file/", {
+    method: "POST",
+    body: formData
+  })
+
+  if (!response.ok) {
+    throw new Error(`File upload failed: ${response.statusText}`)
+  }
+
+  const json = await response.json()
+  return json
 }
 
 // For non-docx files

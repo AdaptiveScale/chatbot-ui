@@ -43,7 +43,6 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setPrompts,
     setTools,
     setModels,
-    selectedWorkspace,
     setSelectedWorkspace,
     setSelectedChat,
     setChatMessages,
@@ -142,7 +141,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setFolders(folders)
 
     const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
-    setFiles(fileData.files)
+    setFiles(fileData)
 
     const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
     setPresets(presetData.presets)

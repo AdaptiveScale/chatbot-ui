@@ -50,7 +50,8 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    assistant_prompts: setModels
   }
 
   const handleDeleteFolderOnly = async () => {

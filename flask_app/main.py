@@ -1,15 +1,23 @@
+import os
 import time
+from datetime import datetime
 
 import pandas as pd
 import plotly.graph_objects as go
+from flask_cors import CORS
 from plotly.io import to_html
 from typing import Dict, Any
 import json
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, request, Response
+from flask_uploads import configure_uploads
+
+from FileHelper import FileHelper
 
 app = Flask(__name__)
-
+app.config.from_object("config.Config")
+configure_uploads(app, (FileHelper().get_image_set(), FileHelper().get_document_set()))
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Sample DataFrames
 df1 = pd.DataFrame({
@@ -152,6 +160,52 @@ def stream_last_node(state: dict) -> None:
 @app.post('/')
 def get_response():
     return Response(stream_last_node(test_input), mimetype='text/event-stream')
+
+
+@app.post('/upload/file/')
+def upload_file():
+    file = request.files.get('file')
+
+    path = FileHelper().upload_document(file, '')
+    return jsonify({
+        'created_at': datetime.now().isoformat(),
+        'description': path,
+        'name': path,
+        'file_path': path,
+        'id': '1',
+        'sharing': path,
+        'size': 100,
+        'tokens': 100
+    }), 200
+
+
+@app.route('/files/', methods=['GET'])
+def list_files():
+    path = os.path.join("static", "documents")
+    try:
+        if not os.path.exists(path):
+            return jsonify({"error": "Directory does not exist"}), 404
+
+        files_info = []
+        for index, file_name in enumerate(os.listdir(path)):
+            file_path = os.path.join(path, file_name)
+            if os.path.isfile(file_path):
+                file_size = os.path.getsize(file_path)
+                files_info.append({
+                    'id': str(index + 1),
+                    'name': file_name,
+                    'description': '',
+                    'file_path': file_path,
+                    'size': file_size,
+                    'created_at': datetime.now().isoformat(),
+                    'sharing': '',
+                    'tokens': 100,
+                    'folder_id': None,
+                    'type': file_name.split('.')[-1]
+                })
+        return jsonify(files_info), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 def check_credentials(username: str, password: str) -> bool:

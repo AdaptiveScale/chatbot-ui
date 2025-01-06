@@ -14,7 +14,7 @@ import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChat } from "@/db/chats"
 import { createCollectionFiles } from "@/db/collection-files"
 import { createCollection } from "@/db/collections"
-import { createFileBasedOnExtension } from "@/db/files"
+import { createFileBasedOnExtension, uploadFileFlask } from "@/db/files"
 import { createModel } from "@/db/models"
 import { createPreset } from "@/db/presets"
 import { createPrompt } from "@/db/prompts"
@@ -67,6 +67,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     chats: createChat,
     presets: createPreset,
     prompts: createPrompt,
+    assistant_prompts: () => {},
     files: async (
       createState: { file: File } & TablesInsert<"files">,
       workspaceId: string
@@ -74,15 +75,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       if (!selectedWorkspace) return
 
       const { file, ...rest } = createState
-
-      const createdFile = await createFileBasedOnExtension(
-        file,
-        rest,
-        workspaceId,
-        selectedWorkspace.embeddings_provider as "openai" | "local"
-      )
-
-      return createdFile
+      const fileUploadResponse = uploadFileFlask(file)
+      return fileUploadResponse
     },
     collections: async (
       createState: {
@@ -181,13 +175,14 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    assistant_prompts: () => {}
   }
 
   const handleCreate = async () => {
     try {
       if (!selectedWorkspace) return
-      if (isTyping) return // Prevent creation while typing
+      if (isTyping) return
 
       const createFunction = createFunctions[contentType]
       const setStateFunction = stateUpdateFunctions[contentType]
