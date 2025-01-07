@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { FLASK_APP_URL } from "@/constants"
 
 export const getPromptById = async (promptId: string) => {
   const { data: prompt, error } = await supabase
@@ -16,7 +17,7 @@ export const getPromptById = async (promptId: string) => {
 }
 
 export const getAgentPrompts = async () => {
-  const promptsResponse = await fetch("http://localhost:8000/agent_prompts/", {
+  const promptsResponse = await fetch(`${FLASK_APP_URL}/agent_prompts/`, {
     method: "GET"
   })
   const prompts = promptsResponse.json()

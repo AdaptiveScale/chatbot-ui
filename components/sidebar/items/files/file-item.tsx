@@ -6,6 +6,7 @@ import { getFileFromStorage } from "@/db/storage/files"
 import { Tables } from "@/supabase/types"
 import { FC, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
+import { FLASK_APP_URL } from "@/constants"
 
 interface FileItemProps {
   file: Tables<"files">
@@ -17,7 +18,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
   const [description, setDescription] = useState(file.description)
 
   const getLinkAndView = async () => {
-    const link = `http://localhost:8000/${file.file_path}`
+    const link = `${FLASK_APP_URL}/${file.file_path}`
     window.open(link, "_blank")
   }
 

@@ -3,6 +3,7 @@ import { TablesInsert, TablesUpdate } from "@/supabase/types"
 import mammoth from "mammoth"
 import { toast } from "sonner"
 import { uploadFile } from "./storage/files"
+import { FLASK_APP_URL } from "@/constants"
 
 export const getFileById = async (fileId: string) => {
   const { data: file, error } = await supabase
@@ -36,7 +37,7 @@ export const getFileWorkspacesByWorkspaceId = async (workspaceId: string) => {
   }
 
   const fetchFiles = async () => {
-    const response = await fetch("http://localhost:8000/files/", {
+    const response = await fetch(`${FLASK_APP_URL}/files/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -106,7 +107,7 @@ export const uploadFileFlask = async (file: File): Promise<any[]> => {
   const formData = new FormData()
   formData.append("file", file)
 
-  const response = await fetch("http://localhost:8000/upload/file/", {
+  const response = await fetch(`${FLASK_APP_URL}/upload/file/`, {
     method: "POST",
     body: formData
   })
