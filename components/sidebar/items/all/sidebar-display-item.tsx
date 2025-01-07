@@ -106,21 +106,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         <div className="ml-3 flex-1 truncate text-sm font-semibold">
           {item.name}
         </div>
-
-        {/* TODO */}
-        {/* {isHovering && (
-          <WithTooltip
-            delayDuration={1000}
-            display={<div>Start chat with {contentType.slice(0, -1)}</div>}
-            trigger={
-              <IconSquarePlus
-                className="cursor-pointer hover:text-blue-500"
-                size={20}
-                onClick={handleClickAction}
-              />
-            }
-          />
-        )} */}
       </div>
     </SidebarUpdateItem>
   )

@@ -67,7 +67,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     chats: createChat,
     presets: createPreset,
     prompts: createPrompt,
-    assistant_prompts: () => {},
+    agent_prompts: () => {},
     files: async (
       createState: { file: File } & TablesInsert<"files">,
       workspaceId: string
@@ -75,7 +75,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       if (!selectedWorkspace) return
 
       const { file, ...rest } = createState
-      const fileUploadResponse = uploadFileFlask(file)
+      const fileUploadResponse = await uploadFileFlask(file)
+      setFiles(fileUploadResponse)
       return fileUploadResponse
     },
     collections: async (
@@ -176,7 +177,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     assistants: setAssistants,
     tools: setTools,
     models: setModels,
-    assistant_prompts: () => {}
+    agent_prompts: () => {}
   }
 
   const handleCreate = async () => {

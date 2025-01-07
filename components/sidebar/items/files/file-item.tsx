@@ -17,7 +17,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
   const [description, setDescription] = useState(file.description)
 
   const getLinkAndView = async () => {
-    const link = await getFileFromStorage(file.file_path)
+    const link = `http://localhost:8000/${file.file_path}`
     window.open(link, "_blank")
   }
 
@@ -41,8 +41,6 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
             <div>{file.type}</div>
 
             <div>{formatFileSize(file.size)}</div>
-
-            <div>{file.tokens.toLocaleString()} tokens</div>
           </div>
 
           <div className="space-y-1">
@@ -53,17 +51,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={FILE_NAME_MAX}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Description</Label>
-
-            <Input
-              placeholder="File description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={FILE_DESCRIPTION_MAX}
+              disabled
             />
           </div>
         </>

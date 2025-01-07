@@ -15,6 +15,14 @@ export const getPromptById = async (promptId: string) => {
   return prompt
 }
 
+export const getAgentPrompts = async () => {
+  const promptsResponse = await fetch("http://localhost:8000/agent_prompts/", {
+    method: "GET"
+  })
+  const prompts = promptsResponse.json()
+  return prompts
+}
+
 export const getPromptWorkspacesByWorkspaceId = async (workspaceId: string) => {
   const { data: workspace, error } = await supabase
     .from("workspaces")

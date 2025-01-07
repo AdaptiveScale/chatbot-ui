@@ -35,7 +35,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         />
         <SidebarSwitchItem
           icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
-          contentType="assistant_prompts"
+          contentType="agent_prompts"
           onContentTypeChange={onContentTypeChange}
         />
         <SidebarSwitchItem

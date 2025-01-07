@@ -17,7 +17,11 @@ export const SidebarSwitchItem: FC<SidebarSwitchItemProps> = ({
   return (
     <WithTooltip
       display={
-        <div>{contentType[0].toUpperCase() + contentType.substring(1)}</div>
+        <div>
+          {contentType === "agent_prompts"
+            ? "Agent Prompts"
+            : contentType[0].toUpperCase() + contentType.substring(1)}
+        </div>
       }
       trigger={
         <TabsTrigger

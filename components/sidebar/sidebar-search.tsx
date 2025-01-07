@@ -15,7 +15,7 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
 }) => {
   return (
     <Input
-      placeholder={`Search ${contentType}...`}
+      placeholder={`Search ${contentType === "agent_prompts" ? "Agent Prompts" : contentType}...`}
       value={searchTerm}
       onChange={e => setSearchTerm(e.target.value)}
     />

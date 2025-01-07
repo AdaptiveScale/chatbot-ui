@@ -11,7 +11,7 @@ EXTENDED_IMAGES = tuple(IMAGES) + ('.ico',)
 
 class CustomUploadSet(UploadSet):
     def file_allowed(self, storage, basename):
-        if basename.lower().endswith('.ico'):
+        if basename.lower().endswith('.txt'):
             return True
         return super().file_allowed(storage, basename)
 
@@ -19,7 +19,7 @@ class CustomUploadSet(UploadSet):
 class FileHelper:
     def __init__(self):
         self.IMAGE_SET = CustomUploadSet('images', EXTENDED_IMAGES)
-        self.DOCUMENT_SET = UploadSet('documents', DOCUMENTS)
+        self.DOCUMENT_SET = CustomUploadSet('documents', DOCUMENTS)
 
     def get_image_set(self):
         return self.IMAGE_SET

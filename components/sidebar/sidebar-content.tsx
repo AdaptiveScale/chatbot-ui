@@ -19,18 +19,20 @@ export const SidebarContent: FC<SidebarContentProps> = ({
   const [searchTerm, setSearchTerm] = useState("")
 
   const filteredData: any = data.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item.name?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
     // Subtract 50px for the height of the workspace settings
     <div className="flex max-h-[calc(100%-50px)] grow flex-col">
-      <div className="mt-2 flex items-center">
-        <SidebarCreateButtons
-          contentType={contentType}
-          hasData={data.length > 0}
-        />
-      </div>
+      {contentType !== "agent_prompts" && (
+        <div className="mt-2 flex items-center">
+          <SidebarCreateButtons
+            contentType={contentType}
+            hasData={data.length > 0}
+          />
+        </div>
+      )}
 
       <div className="mt-2">
         <SidebarSearch

@@ -34,6 +34,9 @@ df2 = pd.DataFrame({
 fig = go.Figure(data=[go.Bar(x=["A", "B", "C"], y=[1, 3, 2])])
 
 
+JSON_FILE = 'test_data.json'
+
+
 def format_output(input_content: Any) -> str:
     """
     Formats and returns output in HTML format.
@@ -157,29 +160,35 @@ def stream_last_node(state: dict) -> None:
         time.sleep(1)
 
 
-@app.post('/')
-def get_response():
-    return Response(stream_last_node(test_input), mimetype='text/event-stream')
+def map_prompts(prompts: list[dict]) -> list[dict]:
+    prompts_mapped = []
+    for index, prompt in enumerate(prompts):
+        prompts_mapped.append({
+            'id': prompt['id'],
+            'name': prompt['name'],
+            'description': prompt['description'],
+            'created_at': datetime.now().isoformat(),
+            'tokens': 100,
+            'folder_id': None,
+        })
+    return prompts_mapped
 
 
-@app.post('/upload/file/')
-def upload_file():
-    file = request.files.get('file')
-
-    path = FileHelper().upload_document(file, '')
-    return jsonify({
-        'created_at': datetime.now().isoformat(),
-        'description': path,
-        'name': path,
-        'file_path': path,
-        'id': '1',
-        'sharing': path,
-        'size': 100,
-        'tokens': 100
-    }), 200
+def load_prompts():
+    try:
+        with open(JSON_FILE, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
 
 
-@app.route('/files/', methods=['GET'])
+def save_prompts(data):
+    with open(JSON_FILE, 'w') as file:
+        json.dump(data, file, indent=4)
+
+
 def list_files():
     path = os.path.join("static", "documents")
     try:
@@ -208,23 +217,49 @@ def list_files():
         return jsonify({"error": str(e)}), 500
 
 
-def check_credentials(username: str, password: str) -> bool:
-    USERNAME = 'admin'
-    PASSWORD = 'admin'
-    return username == USERNAME and password == PASSWORD
+@app.post('/')
+def get_response():
+    return Response(stream_last_node(test_input), mimetype='text/event-stream')
 
 
-@app.post('/login')
-def login():
-    data = request.get_json()
-    username = data.get('username', None)
-    password = data.get('password', None)
-    if check_credentials(username, password):
-        return jsonify({ "msg": "OK"}), 200
-    return jsonify({ "msg": "Bad username or password"}), 401
+@app.post('/upload/file/')
+def upload_file():
+    file = request.files.get('file')
+    FileHelper().upload_document(file, '')
+    return list_files()
 
 
-#Test Input
+@app.route('/files/', methods=['GET'])
+def get_files():
+    return list_files()
+
+
+@app.get('/agent_prompts/')
+def get_agent_prompts():
+    return jsonify(map_prompts(load_prompts())), 200
+
+
+@app.patch('/agent_prompts/')
+def update_agent_prompts():
+    request_data = request.get_json()
+    prompt_id = request_data.get('id', None)
+
+    if prompt_id is None:
+        return jsonify({"error": "No id"}), 400
+
+    data: list[dict] = load_prompts()
+
+    data_to_update_index = next((i for i, d in enumerate(data) if d["id"] == prompt_id), -1)
+
+    if data_to_update_index == -1:
+        return jsonify({"error": "Prompt not found"}), 404
+
+    data[data_to_update_index] = request_data
+    save_prompts(data)
+    return jsonify(map_prompts(data)), 200
+
+
+# Test Input
 test_input = {
     "answer": "Here is the primary response to your question.",
     "pcap_error_analysis": [

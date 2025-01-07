@@ -102,7 +102,7 @@ export const createFileBasedOnExtension = async (
   }
 }
 
-export const uploadFileFlask = async (file: File): Promise<Response> => {
+export const uploadFileFlask = async (file: File): Promise<any[]> => {
   const formData = new FormData()
   formData.append("file", file)
 

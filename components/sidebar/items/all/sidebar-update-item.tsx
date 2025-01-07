@@ -113,7 +113,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setAssistants,
     setTools,
     setModels,
-    setAssistantImages
+    setAssistantImages,
+    setAgentPrompts
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -197,7 +198,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     tools: null,
     models: null,
-    assistant_prompts: null
+    agent_prompts: null
   }
 
   const fetchDataFunctions = {
@@ -228,7 +229,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     tools: null,
     models: null,
-    assistant_prompts: null
+    agent_prompts: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -242,8 +243,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       return item.workspaces
     },
     files: async (fileId: string) => {
-      const item = await getFileWorkspacesByFileId(fileId)
-      return item.workspaces
+      return []
     },
     collections: async (collectionId: string) => {
       const item = await getCollectionWorkspacesByCollectionId(collectionId)
@@ -261,9 +261,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       const item = await getModelWorkspacesByModelId(modelId)
       return item.workspaces
     },
-    assistant_prompts: async (modelId: string) => {
-      const item = await getModelWorkspacesByModelId(modelId)
-      return item.workspaces
+    agent_prompts: async (modelId: string) => {
+      return []
     }
   }
 
@@ -575,22 +574,27 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
       return updatedModel
     },
-    assistant_prompts: async (
-      modelId: string,
-      updateState: TablesUpdate<"models">
+    agent_prompts: async (
+      id: string,
+      { name, description }: { name: string; description: string }
     ) => {
-      const updatedModel = await updateModel(modelId, updateState)
-
-      await handleWorkspaceUpdates(
-        startingWorkspaces,
-        selectedWorkspaces,
-        modelId,
-        deleteModelWorkspace,
-        createModelWorkspaces as any,
-        "model_id"
+      const updatePromptResponse = await fetch(
+        "http://localhost:8000/agent_prompts/",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id: Number(id),
+            name,
+            description
+          })
+        }
       )
-
-      return updatedModel
+      const prompts = await updatePromptResponse.json()
+      // setAgentPrompts(prompts)
+      return prompts.find((prompt: any) => prompt.id === Number(id))
     }
   }
 
@@ -603,7 +607,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     assistants: setAssistants,
     tools: setTools,
     models: setModels,
-    assistant_prompts: setModels
+    agent_prompts: setAgentPrompts
   }
 
   const handleUpdate = async () => {
@@ -624,7 +628,9 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
       setIsOpen(false)
 
-      toast.success(`${contentType.slice(0, -1)} updated successfully`)
+      toast.success(
+        `${contentType === "agent_prompts" ? "Agent prompt" : contentType.slice(0, -1)} updated successfully`
+      )
     } catch (error) {
       toast.error(`Error updating ${contentType.slice(0, -1)}. ${error}`)
     }
@@ -665,37 +671,33 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
-              Edit {contentType.slice(0, -1)}
+              {contentType === "files" ? "View" : "Edit"}{" "}
+              {contentType === "agent_prompts"
+                ? "Agent Prompts"
+                : contentType.slice(0, -1)}
             </SheetTitle>
           </SheetHeader>
 
           <div className="mt-4 space-y-3">
-            {workspaces.length > 1 && (
-              <div className="space-y-1">
-                <Label>Assigned Workspaces</Label>
-
-                <AssignWorkspaces
-                  selectedWorkspaces={selectedWorkspaces}
-                  onSelectWorkspace={handleSelectWorkspace}
-                />
-              </div>
-            )}
-
             {renderInputs(renderState[contentType])}
           </div>
         </div>
 
         <SheetFooter className="mt-2 flex justify-between">
-          <SidebarDeleteItem item={item} contentType={contentType} />
+          {contentType !== "agent_prompts" && contentType !== "files" && (
+            <SidebarDeleteItem item={item} contentType={contentType} />
+          )}
 
           <div className="flex grow justify-end space-x-2">
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
 
-            <Button ref={buttonRef} onClick={handleUpdate}>
-              Save
-            </Button>
+            {contentType !== "files" && (
+              <Button ref={buttonRef} onClick={handleUpdate}>
+                Save
+              </Button>
+            )}
           </div>
         </SheetFooter>
       </SheetContent>

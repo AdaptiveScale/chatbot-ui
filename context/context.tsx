@@ -136,6 +136,11 @@ interface ChatbotUIContext {
   setSelectedTools: Dispatch<SetStateAction<Tables<"tools">[]>>
   toolInUse: string
   setToolInUse: Dispatch<SetStateAction<string>>
+
+  agentPrompts: { id: number; name: string; description: string }[]
+  setAgentPrompts: Dispatch<
+    SetStateAction<{ id: number; name: string; description: string }[]>
+  >
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -261,5 +266,7 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   selectedTools: [],
   setSelectedTools: () => {},
   toolInUse: "none",
-  setToolInUse: () => {}
+  setToolInUse: () => {},
+  agentPrompts: [],
+  setAgentPrompts: () => {}
 })

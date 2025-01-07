@@ -21,6 +21,7 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
+import { AgentPromptItem } from "@/components/sidebar/items/agent-prompts/agent-prompt-item"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -62,6 +63,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
       case "prompts":
         return <PromptItem key={item.id} prompt={item as Tables<"prompts">} />
+
+      case "agent_prompts":
+        return <AgentPromptItem key={item.id} prompt={item} />
 
       case "files":
         return <FileItem key={item.id} file={item as Tables<"files">} />
@@ -141,7 +145,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     assistants: updateAssistant,
     tools: updateTool,
     models: updateModel,
-    assistant_prompts: updateModel
+    agent_prompts: updateModel
   }
 
   const stateUpdateFunctions = {
@@ -153,7 +157,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     assistants: setAssistants,
     tools: setTools,
     models: setModels,
-    assistant_prompts: setModels
+    agent_prompts: setModels
   }
 
   const updateFolder = async (itemId: string, folderId: string | null) => {
