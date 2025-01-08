@@ -14,10 +14,12 @@ export async function POST(request: Request) {
   }
 
   try {
+    const lastMessage =
+      messages.length > 0 ? messages[messages.length - 1].content : ""
     const flaskResponse = await fetch(`${FLASK_APP_URL}/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatSettings, messages, customModelId })
+      body: JSON.stringify({ chatSettings, messages, lastMessage })
     })
 
     if (!flaskResponse.ok) {
