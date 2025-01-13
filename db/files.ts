@@ -117,6 +117,7 @@ export const uploadFileFlask = async (file: File): Promise<any[]> => {
   }
 
   const json = await response.json()
+  window.location.reload()
   return json
 }
 
